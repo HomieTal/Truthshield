@@ -1,0 +1,11 @@
+flask
+mysql-connector-python
+beautifulsoup4
+easyocr
+opencv-python
+numpy
+pandas
+scikit-learn
+requests
+tkinter
+groq
