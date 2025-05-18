@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TruthShield - AI-Powered Fake News Detection</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <style>
+    /* Base styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      line-height: 1.6;
+      color: #e2e8f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); /* Dark gradient background */
+      overflow-x: hidden;
+      perspective: 1000px; /* Enable 3D perspective for elements */
+    }
+    
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    
+    a {
+      text-decoration: none;
+      color: inherit;
+      transition: color 0.2s ease;
+    }
+    
+    /* Button styles with 3D effects */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+      transform-style: preserve-3d;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(45deg, #3b82f6, #60a5fa);
+      color: white;
+      border: none;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+    }
+    
+    .btn-primary:hover {
+      background: linear-gradient(45deg, #2563eb, #3b82f6);
+      transform: translateZ(10px) translateY(-2px);
+      box-shadow: 0 8px 20px rgba(59, 130, 246, 0.6);
+    }
+    
+    .btn-primary:active {
+      transform: translateZ(0) translateY(0);
+      box-shadow: 0 2px 10px rgba(59, 130, 246, 0.3);
+    }
+    
+    .btn-outline {
+      background-color: transparent;
+      border: 2px solid #475569;
+      color: #e2e8f0;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+    
+    .btn-outline:hover {
+      background-color: rgba(71, 85, 105, 0.2);
+      transform: translateZ(5px) translateY(-1px);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+    }
+    
+    .btn-outline:active {
+      transform: translateZ(0) translateY(0);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+    
+    .btn svg {
+      margin-left: 0.5rem;
+      width: 1rem;
+      height: 1rem;
+      transition: transform 0.3s ease;
+    }
+    
+    .btn:hover svg {
+      transform: translateX(3px); /* Subtle arrow movement on hover */
+    }
+    
+    /* Gradient text */
+    .heading-gradient {
+      background: linear-gradient(90deg, #60a5fa, #a78bfa);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* Card background with 3D effects */
+    .bg-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 0.75rem;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      transform-style: preserve-3d;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .bg-card:hover {
+      transform: translateZ(15px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    }
+    
+    /* Muted text */
+    .text-muted-foreground {
+      color: #94a3b8;
+    }
+    
+    /* Header styles */
+    header {
+      width: 100%;
+      padding: 1rem;
+      background: rgba(15, 23, 42, 0.9);
+      border-bottom: 1px solid #334155;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(10px); /* Glassmorphism effect */
+    }
+    
+    .header-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      transform-style: preserve-3d;
+    }
+    
+    .logo-icon {
+      background: linear-gradient(45deg, #3b82f6, #60a5fa);
+      padding: 0.5rem;
+      border-radius: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .logo-icon:hover {
+      transform: translateZ(10px) rotateY(10deg);
+      box-shadow: 0 6px 15px rgba(59, 130, 246, 0.4);
+    }
+    
+    .logo-icon svg {
+      width: 1.25rem;
+      height: 1.25rem;
+      color: white;
+    }
+    
+    .logo-text h1 {
+      font-size: 1.5rem;
+      font-weight: 800;
+    }
+    
+    .logo-text p {
+      font-size: 0.875rem;
+      color: #94a3b8;
+      display: none;
+    }
+    
+    /* Desktop Navigation */
+    .desktop-nav {
+      display: none;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    
+    .desktop-nav a {
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: color 0.2s ease, transform 0.2s ease;
+      position: relative;
+    }
+    
+    .desktop-nav a:hover, .desktop-nav a:focus {
+      color: #60a5fa;
+      transform: translateY(-2px);
+      outline: none;
+    }
+    
+    .desktop-nav a::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: -4px;
+      left: 0;
+      background: #60a5fa;
+      transition: width 0.3s ease;
+    }
+    
+    .desktop-nav a:hover::after {
+      width: 100%;
+    }
+    
+    .warning {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      transform-style: preserve-3d;
+    }
+    
+    .warning svg {
+      width: 0.875rem;
+      height: 0.875rem;
+      color: #fbbf24;
+      transition: transform 0.3s ease;
+    }
+    
+    .warning:hover svg {
+      transform: rotateZ(360deg);
+    }
+    
+    .warning span {
+      font-size: 0.75rem;
+      color: #94a3b8;
+    }
+    
+    /* Mobile Navigation Toggle */
+    .mobile-nav-toggle {
+      display: block;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.25rem;
+      z-index: 30;
+      color: #e2e8f0;
+    }
+    
+    .mobile-nav-toggle svg {
+      width: 1.5rem;
+      height: 1.5rem;
+      transition: transform 0.3s ease;
+    }
+    
+    .mobile-nav-toggle:hover svg {
+      transform: rotate(90deg);
+    }
+    
+    /* Mobile menu */
+    .mobile-menu {
+      display: block;
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 80%;
+      max-width: 320px;
+      background: rgba(15, 23, 42, 0.95);
+      padding: 4rem 1.5rem 2rem;
+      box-shadow: -2px 0 15px rgba(0, 0, 0, 0.5);
+      z-index: 20;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      overflow-y: auto;
+      backdrop-filter: blur(10px);
+    }
+    
+    .mobile-menu.open {
+      transform: translateX(0);
+    }
+    
+    .mobile-menu-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.5rem;
+      color: #94a3b8;
+    }
+    
+    .mobile-menu-close svg {
+      width: 1.5rem;
+      height: 1.5rem;
+      transition: transform 0.3s ease;
+    }
+    
+    .mobile-menu-close:hover svg {
+      transform: rotate(90deg);
+    }
+    
+    .mobile-menu-links {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+    
+    .mobile-menu-links a {
+      font-size: 1.125rem;
+      font-weight: 500;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #334155;
+      transition: transform 0.3s ease, color 0.3s ease;
+    }
+    
+    .mobile-menu-links a:hover, .mobile-menu-links a:focus {
+      color: #60a5fa;
+      transform: translateX(5px);
+      outline: none;
+    }
+    
+    /* Overlay for mobile menu */
+    .menu-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.7);
+      z-index: 15;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .menu-overlay.active {
+      display: block;
+      opacity: 1;
+    }
+
+    /* Main content */
+    main {
+      flex: 1;
+      padding: 1rem 0;
+    }
+    
+    .hero-section {
+      padding: 2rem 0;
+      text-align: center;
+    }
+    
+    .hero-section h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      transform-style: preserve-3d;
+      transition: transform 0.3s ease;
+    }
+    
+    .hero-section h1:hover {
+      transform: translateZ(10px);
+    }
+    
+    .hero-section p {
+      font-size: 1.125rem;
+      color: #94a3b8;
+      max-width: 640px;
+      margin: 0 auto 2rem;
+    }
+    
+    .hero-buttons {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      width: 100%;
+      max-width: 300px;
+      margin: 0 auto;
+    }
+    
+    .hero-buttons .btn {
+      width: 100%;
+      justify-content: center;
+    }
+    
+    .features-section {
+      padding: 3rem 0;
+    }
+    
+    .features-section h2 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 2rem;
+      transform-style: preserve-3d;
+      transition: transform 0.3s ease;
+    }
+    
+    .features-section h2:hover {
+      transform: translateZ(10px);
+    }
+    
+    .feature-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+    
+    .feature-card {
+      padding: 1.5rem;
+      text-align: center;
+      transform-style: preserve-3d;
+    }
+    
+    .feature-icon {
+      width: 3rem;
+      height: 3rem;
+      border-radius: 50%;
+      background: linear-gradient(45deg, #1e3a8a, #2563eb);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .feature-icon:hover {
+      transform: translateZ(10px) rotate(10deg);
+      box-shadow: 0 6px 15px rgba(59, 130, 246, 0.3);
+    }
+    
+    .feature-icon svg {
+      width: 1.5rem;
+      height: 1.5rem;
+      color: #60a5fa;
+    }
+    
+    .feature-card h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    
+    .feature-card h4 {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #94a3b8;
+      margin-bottom: 0.75rem;
+    }
+    
+    .notice-section {
+      padding: 1.5rem 0;
+      margin-bottom: 1.5rem;
+    }
+    
+    .notice-box {
+      max-width: 896px;
+      margin: 0 auto;
+      padding: 1rem;
+      border-left: 4px solid #fbbf24;
+      background: linear-gradient(to right, #27272a, #334155);
+      border-radius: 0 0.75rem 0.75rem 0;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      transform-style: preserve-3d;
+      transition: transform 0.3s ease;
+    }
+    
+    .notice-box:hover {
+      transform: translateZ(10px);
+    }
+    
+    .notice-box .warning {
+      display: flex;
+      align-items: flex-start;
+    }
+    
+    .notice-box svg {
+      width: 1.25rem;
+      height: 1.25rem;
+      color: #fbbf24;
+      margin-right: 0.75rem;
+      flex-shrink: 0;
+      margin-top: 0.125rem;
+      transition: transform 0.3s ease;
+    }
+    
+    .notice-box:hover svg {
+      transform: rotateZ(360deg);
+    }
+    
+    .notice-box h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fcd34d;
+      margin-bottom: 0.5rem;
+    }
+    
+    .notice-box p {
+      color: #e2e8f0;
+      font-size: 0.875rem;
+    }
+    
+    /* Footer styles */
+    footer {
+      width: 100%;
+      padding: 1.5rem 1rem;
+      border-top: 1px solid #334155;
+      background: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(10px);
+    }
+    
+    .footer-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      font-size: 0.875rem;
+      color: #94a3b8;
+    }
+    
+    .footer-links {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .footer-links a {
+      transition: color 0.2s ease, transform 0.2s ease;
+    }
+    
+    .footer-links a:hover, .footer-links a:focus {
+      color: #60a5fa;
+      transform: translateY(-2px);
+      outline: none;
+    }
+    
+    .github-link {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    
+    .github-link svg {
+      width: 1rem;
+      height: 1rem;
+      transition: transform 0.3s ease;
+    }
+    
+    .github-link:hover svg {
+      transform: rotate(10deg);
+    }
+    
+    /* Media queries */
+    @media (min-width: 640px) {
+      .hero-section h1 {
+        font-size: 2.5rem;
+      }
+      
+      .hero-section p {
+        font-size: 1.25rem;
+      }
+      
+      .hero-buttons {
+        flex-direction: row;
+        justify-content: center;
+        max-width: none;
+      }
+      
+      .hero-buttons .btn {
+        width: auto;
+      }
+      
+      .notice-box {
+        padding: 1.5rem;
+      }
+      
+      .notice-box h3 {
+        font-size: 1.125rem;
+      }
+      
+      .notice-box p {
+        font-size: 1rem;
+      }
+    }
+    
+    @media (min-width: 768px) {
+      .logo-text p {
+        display: block;
+      }
+      
+      .desktop-nav {
+        display: flex;
+      }
+      
+      .mobile-nav-toggle {
+        display: none;
+      }
+      
+      .footer-container {
+        flex-direction: row;
+        justify-content: space-between;
+      }
+      
+      main {
+        padding: 2rem 0;
+      }
+      
+      .hero-section {
+        padding: 4rem 0;
+      }
+      
+      .hero-section h1 {
+        font-size: 3rem;
+      }
+      
+      .features-section {
+        padding: 5rem 0;
+      }
+      
+      .features-section h2 {
+        font-size: 2rem;
+        margin-bottom: 3rem;
+      }
+      
+      .feature-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
+      }
+    }
+    
+    @media (min-width: 1024px) {
+      .main-logo-section .logo-icon svg {
+        width: 2.5rem;
+        height: 2.5rem;
+      }
+      
+      .main-logo-section .logo-text h1 {
+        font-size: 2.5rem;
+      }
+      
+      .hero-section {
+        padding: 5rem 0;
+      }
+      
+      .hero-section h1 {
+        font-size: 3.5rem;
+      }
+      
+      .hero-section p {
+        font-size: 1.5rem;
+      }
+      
+      .features-section {
+        padding: 6rem 0;
+      }
+      
+      .feature-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      
+      .feature-card {
+        padding: 2rem;
+      }
+    }
+    
+    /* Prevent content overflow */
+    img, svg {
+      max-width: 100%;
+      height: auto;
+    }
+    
+    /* Touch target sizes for mobile */
+    @media (max-width: 767px) {
+      .mobile-menu-links a,
+      .btn,
+      .footer-links a {
+        padding: 0.75rem 0.5rem;
+      }
+      
+      .footer-links {
+        width: 100%;
+        justify-content: space-around;
+      }
+    }
+    
+    /* Dark theme glow effects */
+    .logo-icon {
+      box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+    }
+    
+    .heading-gradient {
+      text-shadow: 0 0 10px rgba(96, 165, 250, 0.5);
+    }
+    
+    .btn-primary {
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+    }
+    
+    .btn-primary:hover {
+      box-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+    }
+    
+    .feature-icon {
+      box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container header-container">
+      <a href="Home.html" class="logo-container">
+        <div class="logo-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+        </div>
+        <div class="logo-text">
+          <h1>TruthShield</h1>
+          <p>AI-Powered Fake News Detection</p>
+        </div>
+      </a>
+      
+      <nav class="desktop-nav">
+        <a href="Home.html">Home</a>
+        <a href="index.html">Analysis</a>
+        <a href="About.html">About</a>
+        <div class="warning">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+            <path d="M12 9v4"></path>
+            <path d="M12 17h.01"></path>
+          </svg>
+          <span>Always verify sources</span>
+        </div>
+      </nav>
+      
+      <button class="mobile-nav-toggle" aria-label="Toggle mobile menu" id="mobile-menu-toggle">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="4" x2="20" y1="12" y2="12"></line>
+          <line x1="4" x2="20" y1="6" y2="6"></line>
+          <line x1="4" x2="20" y1="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="menu-overlay" id="menu-overlay"></div>
+
+  <div class="mobile-menu" id="mobile-menu">
+    <button class="mobile-menu-close" id="mobile-menu-close" aria-label="Close mobile menu">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+    <div class="mobile-menu-links">
+      <a href="Home.html">Home</a>
+      <a href="index.html">Analysis</a>
+      <a href="About.html">About</a>
+      <div class="warning">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+          <path d="M12 9v4"></path>
+          <path d="M12 17h.01"></path>
+        </svg>
+        <span>Always verify from multiple sources</span>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <div class="container">
+      <section class="hero-section">
+        <h1 class="heading-gradient">TruthShield</h1>
+        <p class="text-muted-foreground">AI-powered fake news detection platform designed to help you identify potentially misleading information.</p>
+        <div class="hero-buttons">
+          <a href="index.html" class="btn btn-primary">Try it now
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </a>
+          <a href="About.html" class="btn btn-outline">Learn more</a>
+        </div>
+      </section>
+
+      <section class="features-section">
+        <h2>How TruthShield Works</h2>
+        <div class="feature-grid">
+          <div class="feature-card bg-card">
+            <div class="feature-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+            </div>
+            <h3>Upload Content</h3>
+            <h4 class="text-muted-foreground">Analyze text, URLs, or images</h4>
+            <p class="text-muted-foreground">Simply input news text, a URL, or upload an image containing news content for analysis.</p>
+          </div>
+          
+          <div class="feature-card bg-card">
+            <div class="feature-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9.5 11a6.5 6.5 0 0 1 5 0"></path>
+                <path d="M9.5 11a6.5 6.5 0 0 1 5 0"></path>
+                <path d="M12 4a4 4 0 0 1 4 4v2a4 4 0 0 1-8 0V8a4 4 0 0 1 4-4z"></path>
+                <path d="M12 10v4"></path>
+                <path d="M8 14a4 4 0 0 0-4 4v2a2 2 0 0 0 2 2"></path>
+                <path d="M16 14a4 4 0 0 1 4 4v2a2 2 0 0 1-2 2"></path>
+              </svg>
+            </div>
+            <h3>AI Analysis</h3>
+            <h4 class="text-muted-foreground">Multiple ML models evaluate content</h4>
+            <p class="text-muted-foreground">Our system uses multiple machine learning models and natural language processing techniques.</p>
+          </div>
+          
+          <div class="feature-card bg-card">
+            <div class="feature-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="22 12 18 12 15 2 9 22 6 12 2 12"></polyline>
+              </svg>
+            </div>
+            <h3>Get Results</h3>
+            <h4 class="text-muted-foreground">Review credibility assessment</h4>
+            <p class="text-muted-foreground">Receive an assessment of content credibility along with confidence scores and explanations.</p>
+          </div>
+        </div>
+      </section>
+      
+      <section class="notice-section">
+        <div class="notice-box">
+          <div class="warning">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+              <path d="M12 9v4"></path>
+              <path d="M12 17h.01"></path>
+            </svg>
+            <div>
+              <h3>Important Notice</h3>
+              <p>No automated system is perfect. Always cross-check information from multiple reliable sources before drawing conclusions.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container footer-container">
+      <div>
+        <p>© 2025 TruthShield. All rights reserved.</p>
+      </div>
+      <div class="footer-links">
+        <a href="#">Terms</a>
+        <a href="#">Privacy</a>
+        <a href="https://github.com" class="github-link" target="_blank" rel="noopener noreferrer">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path>
+            <path d="M9 18c-4.51 2-5-2-7-2"></path>
+          </svg>
+          <span>Source</span>
+        </a>
+      </div>
+    </div>
+  </footer>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+      const mobileMenu = document.getElementById('mobile-menu');
+      const mobileMenuClose = document.getElementById('mobile-menu-close');
+      const menuOverlay = document.getElementById('menu-overlay');
+      const mobileMenuLinks = document.querySelectorAll('.mobile-menu-links a');
+      
+      function openMobileMenu() {
+        mobileMenu.classList.add('open');
+        menuOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+      
+      function closeMobileMenu() {
+        mobileMenu.classList.remove('open');
+        menuOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+      
+      mobileMenuToggle.addEventListener('click', openMobileMenu);
+      mobileMenuClose.addEventListener('click', closeMobileMenu);
+      menuOverlay.addEventListener('click', closeMobileMenu);
+      
+      mobileMenuLinks.forEach(link => {
+        link.addEventListener('click', closeMobileMenu);
+      });
+      
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && mobileMenu.classList.contains('open')) {
+          closeMobileMenu();
+        }
+      });
+      
+      window.addEventListener('resize', function() {
+        if (window.innerWidth >= 768 && mobileMenu.classList.contains('open')) {
+          closeMobileMenu();
+        }
+      });
+    });
+  </script>
+</body>
+</html>
