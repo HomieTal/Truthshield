@@ -1,6 +1,9 @@
 📢 Fake News Detection System
 
+NOTE:
+You can download the dataset from this Google Drive link:
 
+Fake News Dataset
 
 🌟 Overview
 Welcome to the Fake News Detection System, a powerful tool designed to combat misinformation by analyzing news articles for authenticity. Whether you're inputting text, URLs, or images, this system leverages machine learning and optional AI analysis to deliver accurate results. It features a user-friendly Tkinter GUI and a robust Flask-based web API, making it accessible for both casual users and developers.
@@ -21,6 +24,7 @@ Advanced Machine Learning:
 
 AI-Powered Analysis:
 🧠 Optional Groq API integration for deeper insights
+NOTE: GET THE API KEYS FROM GROQ AI AND SAVE IT AS API.txt
 
 
 Data Sources:
